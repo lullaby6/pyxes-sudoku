@@ -1,5 +1,5 @@
 const TITLE = 'Sudoku - Pyxes'
-const GRID_SIZE = 50
+let GRID_SIZE = calcGrid()
 const FPS = 30
 const BG_COLOR = '#fff'
 
@@ -24,18 +24,30 @@ const SELECTED_INFO_CELL_COLOR = '#67e8f9'
 const playerBoard = Array(9).fill().map(() => Array(9).fill(0))
 const board = Array(9).fill().map(() => Array(9).fill(0))
 
+function calcGrid() {
+    let grid = 0
+
+    let windowHeight = window.innerHeight
+    let windowWidth = window.innerWidth
+
+    if (windowHeight > windowWidth) {
+        grid = windowWidth / 9
+    } else {
+        grid = windowHeight / 9
+    }
+
+    return grid
+}
+
 function isValid(board, row, col, num) {
-    // Verifica fila
     for (let x = 0; x < 9; x++) {
         if (board[row][x] === num) return false;
     }
 
-    // Verifica columna
     for (let x = 0; x < 9; x++) {
         if (board[x][col] === num) return false;
     }
 
-    // Verifica subcuadro 3x3
     const startRow = Math.floor(row / 3) * 3;
     const startCol = Math.floor(col / 3) * 3;
     for (let i = 0; i < 3; i++) {
@@ -100,6 +112,8 @@ const Cell = {
         offsetY: GRID_SIZE/6,
     },
 
+    row: 0,
+    col: 0,
     value: 0,
     revelated: false,
     selected: false,
@@ -211,6 +225,17 @@ const Cell = {
         current.text.value = ''
 
         playerBoard[Math.floor(current.y/GRID_SIZE)][Math.floor(current.x/GRID_SIZE)] = 0
+    },
+
+    calc: current => {
+        current.setSize(GRID_SIZE, GRID_SIZE)
+
+        current.x = current.row * GRID_SIZE
+        current.y = current.col * GRID_SIZE
+
+        current.text.fontSize = GRID_SIZE/2
+        current.text.offsetX = GRID_SIZE/3
+        current.text.offsetY = GRID_SIZE/6
     }
 }
 
@@ -268,8 +293,9 @@ const MainScene = {
 
                 cell.text.value = board[row][col].toString()
                 cell.value = board[row][col]
-                cell.x = (col * GRID_SIZE)
-                cell.y = (row * GRID_SIZE)
+                cell.row = row
+                cell.col = col
+                cell.calc(cell)
             }
         }
 
@@ -341,3 +367,13 @@ const game = new Game({
 })
 
 game.run()
+
+window.addEventListener('resize', () => {
+    GRID_SIZE = calcGrid()
+
+    game.setSize(GRID_SIZE * 9, GRID_SIZE * 9)
+
+    game.scenes.main.cells.forEach(cell => {
+        cell.calc(cell)
+    })
+})
