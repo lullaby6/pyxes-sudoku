@@ -1,5 +1,5 @@
 const TITLE = 'Sudoku - Pyxes'
-let GRID_SIZE = calcGrid()
+let GRID_SIZE = 0
 const FPS = 30
 const BG_COLOR = '#fff'
 
@@ -25,19 +25,11 @@ const playerBoard = Array(9).fill().map(() => Array(9).fill(0))
 const board = Array(9).fill().map(() => Array(9).fill(0))
 
 function calcGrid() {
-    let grid = 0
-
-    let windowHeight = window.innerHeight
-    let windowWidth = window.innerWidth
-
-    if (windowHeight > windowWidth) {
-        grid = windowWidth / 9
-    } else {
-        grid = windowHeight / 9
-    }
-
-    return grid
+    if (window.innerHeight > window.innerWidth) GRID_SIZE = window.innerWidth / 9
+    else GRID_SIZE = (window.innerHeight / 9) / 1.5
 }
+
+calcGrid()
 
 function isValid(board, row, col, num) {
     for (let x = 0; x < 9; x++) {
@@ -101,15 +93,10 @@ const Cell = {
     color: CELL_COLOR,
     visible: false,
     tags: ['cell'],
-    width: GRID_SIZE,
-    height: GRID_SIZE,
     text: {
         value: '0',
         color: FONT_COLOR,
-        fontSize: GRID_SIZE/2,
         font: FONT,
-        offsetX: GRID_SIZE/3,
-        offsetY: GRID_SIZE/6,
     },
 
     row: 0,
@@ -119,6 +106,10 @@ const Cell = {
     selected: false,
     info: false,
     setted: false,
+
+    onLoad: current => {
+        current.calc(current)
+    },
 
     onCurrentClick: ({current}) => {
         current.select(current)
@@ -251,11 +242,11 @@ const Board = {
 
             current.scene.game.ctx.beginPath()
             current.scene.game.ctx.moveTo(GRID_SIZE * i, 0)
-            current.scene.game.ctx.lineTo(GRID_SIZE * i, current.scene.game.height)
+            current.scene.game.ctx.lineTo(GRID_SIZE * i, GRID_SIZE * 9)
             current.scene.game.ctx.stroke()
             current.scene.game.ctx.beginPath()
             current.scene.game.ctx.moveTo(0, GRID_SIZE * i)
-            current.scene.game.ctx.lineTo(current.scene.game.width, GRID_SIZE * i)
+            current.scene.game.ctx.lineTo(GRID_SIZE * 9, GRID_SIZE * i)
             current.scene.game.ctx.stroke()
 
             if (i % 3 == 0) {
@@ -263,11 +254,11 @@ const Board = {
 
                 current.scene.game.ctx.beginPath()
                 current.scene.game.ctx.moveTo(GRID_SIZE * i, 0)
-                current.scene.game.ctx.lineTo(GRID_SIZE * i, current.scene.game.height)
+                current.scene.game.ctx.lineTo(GRID_SIZE * i, GRID_SIZE * 9)
                 current.scene.game.ctx.stroke()
                 current.scene.game.ctx.beginPath()
                 current.scene.game.ctx.moveTo(0, GRID_SIZE * i)
-                current.scene.game.ctx.lineTo(current.scene.game.width, GRID_SIZE * i)
+                current.scene.game.ctx.lineTo(GRID_SIZE * 9, GRID_SIZE * i)
                 current.scene.game.ctx.stroke()
             }
         }
@@ -345,6 +336,16 @@ const MainScene = {
     win: current => {
         alert('¡Congratulations! You won!')
     },
+
+    resize: current => {
+        calcGrid()
+
+        current.game.setSize(GRID_SIZE * 9, GRID_SIZE * 9)
+
+        current.cells.forEach(cell => {
+            cell.calc(cell)
+        })
+    }
 }
 
 const game = new Game({
@@ -369,11 +370,5 @@ const game = new Game({
 game.run()
 
 window.addEventListener('resize', () => {
-    GRID_SIZE = calcGrid()
-
-    game.setSize(GRID_SIZE * 9, GRID_SIZE * 9)
-
-    game.scenes.main.cells.forEach(cell => {
-        cell.calc(cell)
-    })
+    game.scenes.main.resize(game.scenes.main)
 })

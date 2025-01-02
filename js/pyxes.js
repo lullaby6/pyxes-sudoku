@@ -786,12 +786,16 @@ class Game {
         this.width = width
         this.cv.width = width
         this.cv.style.width = `${width}px`
+        this.ctx.canvas.width = width
+        this.ctx.width = width
     }
 
     setHeight(height) {
         this.height = height
         this.cv.height = height
         this.cv.style.height = `${height}px`
+        this.ctx.canvas.height = height
+        this.ctx.height = height
     }
 
     setSize(width, height){
