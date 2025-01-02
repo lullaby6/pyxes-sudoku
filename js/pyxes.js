@@ -724,6 +724,10 @@ class Game {
 
     stop() {
         clearInterval(this.updateInterval)
+
+        this.running = false
+
+        if (this.onStop && typeof this.onStop === 'function') this.onStop(this)
     }
 
     addScene(name, scene) {

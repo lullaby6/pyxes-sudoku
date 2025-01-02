@@ -60,12 +60,12 @@ function fillBoard(board) {
                     if (isValid(board, row, col, num)) {
                         board[row][col] = num;
                         if (fillBoard(board)) {
-                            return true; // Avanza si es posible completar el tablero
+                            return true;
                         }
-                        board[row][col] = 0; // Retrocede si no es posible
+                        board[row][col] = 0;
                     }
                 }
-                return false; // No es posible llenar esta celda
+                return false;
             }
         }
     }
@@ -345,6 +345,8 @@ const MainScene = {
         current.cells.forEach(cell => {
             cell.calc(cell)
         })
+
+        current.game.camera.setPosition(GRID_SIZE * 9 / 2, GRID_SIZE * 9 / 2)
     }
 }
 
